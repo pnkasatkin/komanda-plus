@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Команда+ — Организационная диагностика</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --text:#1f2430; --muted:#6b7280;
+    --line:#e5e7eb; --accent:#7ab800; --accent-dark:#5f9100;
+    --accent-soft:#eef7dc; --danger:#ef4444;
+    --radius:14px; --shadow:0 2px 10px rgba(20,25,35,.05);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.5}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 16px 60px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+  .brand{font-weight:700;font-size:20px}
+  .brand span{color:var(--accent)}
+  .sub{font-size:13px;color:var(--muted)}
+  .progress{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);margin-bottom:18px}
+  .progress-bar{flex:1;height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+  .progress-fill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s ease}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+        box-shadow:var(--shadow);padding:26px 24px;margin-bottom:16px}
+  .block-tag{display:inline-block;font-size:12px;font-weight:600;color:var(--accent-dark);
+             background:var(--accent-soft);padding:3px 9px;border-radius:99px;margin-bottom:10px}
+  .q-title{font-size:18px;font-weight:600;margin:0 0 4px}
+  .q-hint{font-size:13px;color:var(--muted);margin:0 0 18px}
+  .required{color:var(--danger);margin-left:2px}
+
+  .options{display:flex;flex-direction:column;gap:8px}
+  .opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);
+       border-radius:10px;background:#fff;cursor:pointer;transition:all .15s;font-size:15px}
+  .opt:hover{border-color:#cfd4dc;background:#fafbfc}
+  .opt.selected{border-color:var(--accent);background:var(--accent-soft)}
+  .opt input{accent-color:var(--accent);width:18px;height:18px;margin:0}
+
+  .scale{display:flex;flex-direction:column;gap:8px}
+  .scale-label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:2px}
+  .scale-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);
+             border-radius:10px;cursor:pointer;transition:all .15s}
+  .scale-opt:hover{border-color:#cfd4dc;background:#fafbfc}
+  .scale-opt.selected{border-color:var(--accent);background:var(--accent-soft)}
+  .scale-opt input{accent-color:var(--accent);width:18px;height:18px;margin:0}
+  .scale-num{font-weight:600;width:22px;text-align:center}
+  .scale-text{font-size:15px}
+
+  .dont-know{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+  .dont-know label{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);cursor:pointer}
+  .dont-know input{accent-color:var(--muted);width:17px;height:17px;margin:0}
+
+  .footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .footer .left{display:flex;gap:10px;flex-wrap:wrap}
+
+  button{font:inherit;font-weight:600;font-size:15px;padding:12px 20px;border-radius:10px;
+         border:1px solid transparent;cursor:pointer;transition:all .15s}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:hover{background:var(--accent-dark)}
+  .btn-primary:disabled{background:#c7d6a3;cursor:not-allowed}
+  .btn-ghost{background:#fff;color:var(--text);border-color:var(--line)}
+  .btn-ghost:hover{border-color:#cfd4dc;background:#fafbfc}
+
+  .hero{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+        box-shadow:var(--shadow);padding:32px 28px;margin-bottom:20px}
+  .hero h1{font-size:26px;margin:0 0 12px;line-height:1.25}
+  .hero p{font-size:15px;color:var(--muted);margin:0 0 18px}
+  .features{display:flex;flex-direction:column;gap:14px;margin:22px 0}
+  .feature{display:flex;gap:12px;align-items:flex-start}
+  .feature .ico{flex:0 0 30px;height:30px;border-radius:8px;background:var(--accent-soft);
+                color:var(--accent-dark);display:flex;align-items:center;justify-content:center;
+                font-weight:700;font-size:14px}
+  .feature b{display:block;font-size:15px;margin-bottom:2px}
+  .feature span{font-size:14px;color:var(--muted)}
+
+  .form-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+             box-shadow:var(--shadow);padding:28px}
+  .form-card h2{font-size:18px;margin:0 0 6px}
+  .form-card .hint{font-size:13px;color:var(--muted);margin:0 0 18px}
+  label{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
+  input[type=text],input[type=email]{width:100%;padding:12px 14px;border:1px solid var(--line);
+    border-radius:10px;font:inherit;background:#fff}
+  input:focus{outline:none;border-color:var(--accent)}
+  .form-card button{width:100%;margin-top:18px}
+  .fine{font-size:12px;color:var(--muted);margin-top:12px;text-align:center}
+
+  .metric{display:flex;justify-content:space-between;align-items:center;gap:10px;
+          padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+  .metric:last-child{border-bottom:none}
+  .metric .val{font-weight:600;text-align:right}
+  .badge{display:inline-block;padding:3px 9px;border-radius:99px;background:var(--accent-soft);
+         color:var(--accent-dark);font-size:12px;font-weight:600}
+  .badge.warn{background:#fff3d6;color:#8a6100}
+  .badge.bad{background:#fde7e7;color:#a02525}
+  .rec{margin-top:18px}
+  .rec h3{font-size:15px;margin:0 0 8px}
+  .rec ul{margin:0;padding-left:18px;font-size:14px}
+  .rec li{margin-bottom:6px}
+  .muted{color:var(--muted);font-size:13px}
+  .en{color:#9ca3af;font-size:11px;font-weight:400}
+  .hidden{display:none}
+  .box{background:#f8f9fb;border-left:3px solid var(--accent);padding:12px 16px;
+       border-radius:0 8px 8px 0;margin:12px 0;font-size:14px}
+  @media (max-width:480px){
+    .card{padding:18px 16px}.q-title{font-size:17px}
+    button{padding:11px 16px;font-size:14px}
+    .hero{padding:24px 20px}.hero h1{font-size:22px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">Команда<span>+</span></div>
+    <div class="sub" id="headerSub">Поддержка онлайн</div>
+  </header>
+
+  <div class="progress hidden" id="progressWrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div id="progressText">0% пройдено</div>
+  </div>
+
+  <main id="app"></main>
+</div>
+
+<script>
+/* =========================================================
+   НАСТРОЙКИ — ЗАМЕНИТЕ API_URL НА ВАШ URL APPS SCRIPT
+   ========================================================= */
+const API_URL = 'https://script.google.com/macros/s/AKfycby6Y4-P_JF60c-TNqe_kDcAbG3cRRI3VVwYrUJFKteCniGRGxqamdzTqEnLH6YMtFUZ/exec';
+
+/* =========================================================
+   РЕЖИМ
+   ========================================================= */
+const urlParams = new URLSearchParams(location.search);
+const COMPANY_TOKEN = urlParams.get('c') || '';
+const MODE = COMPANY_TOKEN ? 'survey' : 'landing';
+
+/* =========================================================
+   ДАННЫЕ ТЕСТА
+   ========================================================= */
+const blocks = [
+  { id:'b1', name:'Блок 1 — Вовлечённость', questions:[
+    {id:'b1q1', type:'scale', title:'Мне нравится моя работа.', low:'Совсем не согласен', high:'Полностью согласен'},
+    {id:'b1q2', type:'scale', title:'Я чувствую себя частью команды.', low:'Совсем не согласен', high:'Полностью согласен'},
+    {id:'b1q3', type:'scale', title:'Я получаю эмоциональную поддержку на работе.', low:'Совсем не согласен', high:'Полностью согласен'},
+    {id:'b1q4', type:'scale', title:'Я проявляю инициативу сверх моих обязанностей.', low:'Совсем не согласен', high:'Полностью согласен'},
+    {id:'b1q5', type:'scale', title:'Я помогаю коллегам даже когда они меня об этом не просят.', low:'Совсем не согласен', high:'Полностью согласен'},
+    {id:'b1q6', type:'scale', title:'Я предлагаю идеи и беру на себя ответственность.', low:'Совсем не согласен', high:'Полностью согласен'},
+    {id:'b1q7', type:'scale', title:'Я понимаю, зачем нужна моя работа.', low:'Совсем не согласен', high:'Полностью согласен'},
+    {id:'b1q8', type:'scale', title:'Я знаю, как моя работа влияет на результат компании.', low:'Совсем не согласен', high:'Полностью согласен'},
+    {id:'b1q9', type:'scale', title:'Мне ясно, какие ожидаемые результаты от моей роли.', low:'Совсем не согласен', high:'Полностью согласен'},
+    {id:'b1q10', type:'scale', title:'Я чувствую личную ответственность за результат.', low:'Совсем не согласен', high:'Полностью согласен'}
+  ]},
+  { id:'b2', name:'Блок 2 — Отношения и поток информации', questions:[
+    {id:'b2q1', type:'text', title:'Кто ваш прямой руководитель?', hint:'ФИО'},
+    {id:'b2q2', type:'number', title:'Сколько человек находится в вашем подчинении?', hint:'Введите число'},
+    {id:'b2q3', type:'scale', title:'Насколько вы понимаете устройство своей команды/отдела?', low:'Совсем не понимаю', high:'Полностью понимаю'},
+    {id:'b2q4', type:'scale', title:'Насколько вы понимаете, как работа вашей команды влияет на всю компанию?', low:'Совсем не понимаю', high:'Полностью понимаю'},
+    {id:'b2q5', type:'scale', title:'Насколько часто вам приходится обращаться в другие отделы?', low:'Никогда', high:'Очень часто'},
+    {id:'b2q6', type:'multi', title:'Отметьте отделы, от которых зависит работа вашего отдела',
+     options:['Закупка','Производство','Бухгалтерия','Склад','Финансы','Юридический','IT']},
+    {id:'b2q7', type:'scale', title:'Часто ли вам не хватает информации от других отделов?', low:'Никогда', high:'Очень часто'},
+    {id:'b2q8', type:'multi', title:'Отметьте отделы, от которых вам нужно больше информации',
+     options:['Закупка','Производство','Бухгалтерия','Склад','Финансы','Юридический','IT']},
+    {id:'b2q9', type:'scale', title:'Легко ли вам найти нужного человека в компании, когда он требуется?', low:'Очень сложно', high:'Очень легко'},
+    {id:'b2q10', type:'scale', title:'Получаете ли вы ясные инструкции от руководства?', low:'Никогда', high:'Всегда'},
+    {id:'b2q11', type:'text', title:'Есть ли у вас предложения по улучшению взаимодействия?', hint:'Короткий текст'},
+    {id:'b2q12', type:'scale', title:'Хотели бы вы больше общения с другими отделами?', low:'Совсем нет', high:'Очень хочу'}
+  ]},
+  { id:'b3', name:'Блок 3 — Целеполагание и управление временем', questions:[
+    {id:'b3q1', type:'binary', title:'Есть ли у вас цели на 6 месяцев?', yes:'Да', no:'Нет'},
+    {id:'b3q2', type:'scale', title:'Насколько цели понятные и конкретные (SMART)?', low:'Совсем не конкретные', high:'Очень конкретные'},
+    {id:'b3q3', type:'scale', title:'Как часто вы планируете рабочий день?', low:'Никогда', high:'Каждый день'},
+    {id:'b3q4', type:'binary', title:'Используете ли вы список задач (to-do) / планировщик?', yes:'Да', no:'Нет'},
+    {id:'b3q5', type:'scale', title:'Как часто вы отслеживаете, сколько времени уходит на исполнение отдельной задачи?', low:'Никогда', high:'Всегда'},
+    {id:'b3q6', type:'scale', title:'Насколько легко вам расставлять приоритеты при выполнении рабочих задач?', low:'Очень сложно', high:'Очень легко'},
+    {id:'b3q7', type:'choice', title:'Что вас чаще всего отвлекает?', hint:'Выберите категорию',
+     options:[
+       {value:'internal', label:'Внутренние (перфекционизм, нерешительность)'},
+       {value:'external', label:'Внешние (частые отвлечения, совещания)'},
+       {value:'systemic', label:'Системные (неясные приоритеты, перегрузка)'}
+     ]},
+    {id:'b3q8', type:'scale', title:'Насколько хорошо вы отслеживаете прогресс по достижению своих целей?', low:'Совсем не отслеживаю', high:'Отлично отслеживаю'}
+  ]},
+  { id:'b4', name:'Блок 4 — Мотивационный профиль', questions:[
+    {id:'b4q1', type:'choice', title:'Что вас мотивирует больше всего?', options:[
+      {value:'achievement', label:'Интересные задачи'},
+      {value:'compensation', label:'Деньги'},
+      {value:'recognition', label:'Признание'},
+      {value:'security', label:'Стабильность'}
+    ]},
+    {id:'b4q2', type:'choice', title:'Что важнее для вас сейчас: рост по карьерной лестнице или стабильность?', options:[
+      {value:'growth', label:'Рост по карьерной лестнице'},
+      {value:'security', label:'Стабильность'}
+    ]},
+    {id:'b4q3', type:'scale', title:'Насколько для вас важна зарплата?', low:'Совсем не важна', high:'Очень важна'},
+    {id:'b4q4', type:'scale', title:'Насколько для вас важно признание ваших заслуг коллегами и руководителем?', low:'Совсем не важно', high:'Очень важно'},
+    {id:'b4q5', type:'scale', title:'Насколько важны интересные задачи?', low:'Совсем не важны', high:'Очень важны'},
+    {id:'b4q6', type:'scale', title:'Насколько важен баланс работа/личная жизнь?', low:'Совсем не важен', high:'Очень важен'},
+    {id:'b4q7', type:'choice', title:'Что вас больше всего демотивирует?', options:[
+      {value:'management', label:'Плохое управление: неясные ожидания, плохое руководство'},
+      {value:'relationship', label:'Плохие отношения: конфликты, отсутствие признания'},
+      {value:'growth', label:'Плохие перспективы роста: нет обучения, тупиковые роли'},
+      {value:'environmental', label:'Плохие условия работы: оборудование, неудобства'}
+    ]},
+    {id:'b4q8', type:'choice', title:'Вы бы предпочли повышение зарплаты сейчас или обучение/развитие?', options:[
+      {value:'compensation', label:'Повышение зарплаты сейчас'},
+      {value:'development', label:'Обучение и развитие'}
+    ]}
+  ]}
+];
+
+const allQuestions = [];
+blocks.forEach(b => b.questions.forEach(q => allQuestions.push({...q, blockId:b.id, blockName:b.name})));
+const total = allQuestions.length;
+const answers = {};
+let current = 0;
+
+/* =========================================================
+   ЛЕНДИНГ
+   ========================================================= */
+function renderLanding(){
+  document.getElementById('progressWrap').classList.add('hidden');
+  document.getElementById('headerSub').textContent = 'Поддержка онлайн';
+
+  document.getElementById('app').innerHTML = `
+    <div class="hero">
+      <h1>Узнайте, что на самом деле происходит в вашей команде</h1>
+      <p>Анонимный опрос для сотрудников. Вы получаете объективную картину вовлечённости,
+         взаимодействия отделов, эффективности управления временем и мотивации —
+         и конкретные рекомендации, что с этим делать.</p>
+
+      <div class="features">
+        <div class="feature"><div class="ico">1</div>
+          <div><b>4 блока диагностики</b>
+            <span>Вовлечённость, отношения и поток информации, целеполагание, мотивация.</span></div></div>
+        <div class="feature"><div class="ico">2</div>
+          <div><b>38 вопросов — 10–15 минут</b>
+            <span>Сотрудники заполняют анонимно. Вы видите только агрегированные результаты.</span></div></div>
+        <div class="feature"><div class="ico">3</div>
+          <div><b>Отчёт с рекомендациями</b>
+            <span>Не просто цифры, а что конкретно делать: с чего начать, какой тренинг поможет.</span></div></div>
+        <div class="feature"><div class="ico">4</div>
+          <div><b>Оргструктура и связи</b>
+            <span>Карта того, кто с кем работает и где рвутся коммуникации.</span></div></div>
+        <div class="feature"><div class="ico">5</div>
+          <div><b>Индивидуальные отчёты</b>
+            <span>Каждый сотрудник получает свой личный отчёт после заполнения.</span></div></div>
+      </div>
+
+      <p><b>Что нужно от вас:</b> только email и название компании. Мы создадим персональную
+         ссылку для рассылки сотрудникам и пришлём вам отчёты, когда наберётся достаточно ответов.</p>
+    </div>
+
+    <div class="hero" style="margin-bottom:20px">
+      <h2 style="font-size:18px;margin:0 0 14px">Что вы получите</h2>
+      <div class="features">
+        <div class="feature"><div class="ico">📄</div>
+          <div><b>Ответы.xlsx</b>
+            <span>Сырые данные всех ответов — можно фильтровать и строить свои срезы.</span></div></div>
+        <div class="feature"><div class="ico">🗺</div>
+          <div><b>Оргструктура.pdf</b>
+            <span>Карта взаимодействия отделов: кто от кого зависит, где рвутся коммуникации.</span></div></div>
+        <div class="feature"><div class="ico">📊</div>
+          <div><b>Отчёт_кратко.pdf</b>
+            <span>Одна страница — главное: индексы, точки роста, с чего начать.</span></div></div>
+        <div class="feature"><div class="ico">📘</div>
+          <div><b>Отчёт_полный.pdf</b>
+            <span>Разбор по каждому блоку с обоснованием рекомендаций и подбором тренингов.</span></div></div>
+        <div class="feature"><div class="ico">👤</div>
+          <div><b>Индивидуальные отчёты</b>
+            <span>Каждый сотрудник получает свой персональный отчёт после заполнения.</span></div></div>
+      </div>
+    </div>
+
+    <div class="form-card" id="formCard">
+      <h2>Создать опрос для своей команды</h2>
+      <p class="hint">Заполните поля — мы пришлём ссылку и папку с отчётами.</p>
+
+      <label for="company">Название компании или отдела</label>
+      <input type="text" id="company" placeholder="Например: ООО «Ромашка», отдел продаж">
+
+      <label for="name">Ваше имя</label>
+      <input type="text" id="name" placeholder="Как к вам обращаться">
+
+      <label for="email">Email для отчётов</label>
+      <input type="email" id="email" placeholder="you@company.ru">
+
+      <button class="btn-primary" id="submitBtn" onclick="createSurvey()">Создать опрос</button>
+      <div class="fine">Нажимая кнопку, вы соглашаетесь с обработкой персональных данных.</div>
+    </div>
+
+    <div class="form-card" id="successCard" style="display:none">
+      <div style="text-align:center">
+        <div style="font-size:42px;line-height:1;margin-bottom:12px">✓</div>
+        <h2 style="margin:0 0 8px">Опрос создан</h2>
+        <p class="hint" style="margin-bottom:20px">Отправили ссылку и доступ к папке на ваш email.</p>
+      </div>
+
+      <label>Ссылка для рассылки сотрудникам</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="surveyLink" readonly style="flex:1">
+        <button class="btn-ghost" style="width:auto;margin:0" onclick="copyLink()">Копировать</button>
+      </div>
+
+      <p class="hint" style="margin-top:18px">Что дальше:</p>
+      <ul style="font-size:14px;color:var(--muted);margin:6px 0 0 18px;padding:0">
+        <li>Разошлите ссылку сотрудникам.</li>
+        <li>Когда наберётся достаточно ответов — мы соберём отчёты.</li>
+        <li>Вы получите письмо со ссылкой на папку с PDF-отчётами.</li>
+      </ul>
+    </div>
+  `;
+}
+
+async function createSurvey(){
+  const company = document.getElementById('company').value.trim();
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const btn = document.getElementById('submitBtn');
+
+  if (!company || !name || !email){ alert('Заполните все поля'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Создаём…';
+
+  try {
+    const res = await fetch(API_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({action:'createCompany', company, name, email})
+    });
+    const data = await res.json();
+    if (data.ok){
+      document.getElementById('formCard').style.display = 'none';
+      document.getElementById('successCard').style.display = 'block';
+      document.getElementById('surveyLink').value = data.surveyUrl;
+      window.scrollTo({top:0, behavior:'smooth'});
+    } else {
+      alert('Ошибка: ' + (data.error || 'неизвестная'));
+      btn.disabled = false; btn.textContent = 'Создать опрос';
+    }
+  } catch(e){
+    alert('Не удалось связаться с сервером: ' + e.message);
+    btn.disabled = false; btn.textContent = 'Создать опрос';
+  }
+}
+
+function copyLink(){
+  const input = document.getElementById('surveyLink');
+  input.select();
+  document.execCommand('copy');
+  alert('Ссылка скопирована');
+}
+
+/* =========================================================
+   ТЕСТ
+   ========================================================= */
+function startSurvey(){
+  document.getElementById('progressWrap').classList.remove('hidden');
+  current = 0;
+  Object.keys(answers).forEach(k => delete answers[k]);
+  loadCompanyName();
+  renderQuestion();
+}
+
+async function loadCompanyName(){
+  if (!COMPANY_TOKEN) return;
+  try {
+    const res = await fetch(API_URL + '?action=getSurvey&c=' + COMPANY_TOKEN);
+    const data = await res.json();
+    if (data.ok && data.company){
+      document.getElementById('headerSub').textContent = data.company;
+    }
+  } catch(e){ /* игнорируем */ }
+}
+
+function renderQuestion(){
+  const q = allQuestions[current];
+  const done = Object.keys(answers).length;
+  const percent = Math.round((done/total)*100);
+  document.getElementById('progressFill').style.width = percent+'%';
+  document.getElementById('progressText').textContent = percent+'% пройдено';
+
+  let body = '';
+  const val = answers[q.id];
+
+  if (q.type === 'scale'){
+    body += `<div class="scale-label"><span>${q.low}</span><span>${q.high}</span></div><div class="scale">`;
+    for (let n=1;n<=5;n++){
+      const sel = val===n ? 'selected':'';
+      body += `<label class="scale-opt ${sel}">
+        <input type="radio" name="${q.id}" value="${n}" ${val===n?'checked':''}
+               onchange="selectAnswer('${q.id}', ${n})">
+        <span class="scale-num">${n}</span>
+        <span class="scale-text">${n===1?q.low:n===5?q.high:'Оценка '+n}</span></label>`;
+    }
+    body += `</div>`;
+  } else if (q.type === 'choice'){
+    body += `<div class="options">`;
+    q.options.forEach(o=>{
+      const sel = val===o.value?'selected':'';
+      body += `<label class="opt ${sel}">
+        <input type="radio" name="${q.id}" value="${o.value}" ${val===o.value?'checked':''}
+               onchange="selectAnswer('${q.id}','${o.value}')">
+        <span>${o.label}</span></label>`;
+    });
+    body += `</div>`;
+  } else if (q.type === 'multi'){
+    const arr = Array.isArray(val) ? val : [];
+    const selectedOpts = arr.filter(v => q.options.includes(v));
+    const otherVal = arr.find(v => typeof v === 'string' && !q.options.includes(v) && v !== 'dont_know') || '';
+    body += `<div class="options">`;
+    q.options.forEach(o=>{
+      const sel = selectedOpts.includes(o) ? 'selected' : '';
+      body += `<label class="opt ${sel}">
+        <input type="checkbox" value="${o}" ${selectedOpts.includes(o)?'checked':''}
+               onchange="toggleMulti('${q.id}', this)">
+        <span>${o}</span></label>`;
+    });
+    body += `</div>`;
+    body += `<div style="margin-top:12px">
+      <label class="muted" style="display:block;margin-bottom:6px">Другое (впишите свой вариант)</label>
+      <input type="text" value="${otherVal}" placeholder="Например: Маркетинг"
+        oninput="setMultiOther('${q.id}', this.value)"
+        style="width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font:inherit">
+    </div>`;
+  } else if (q.type === 'binary'){
+    body += `<div class="options">`;
+    [['1',q.yes],['0',q.no]].forEach(([v,l])=>{
+      const sel = val===v?'selected':'';
+      body += `<label class="opt ${sel}">
+        <input type="radio" name="${q.id}" value="${v}" ${val===v?'checked':''}
+               onchange="selectAnswer('${q.id}','${v}')">
+        <span>${l}</span></label>`;
+    });
+    body += `</div>`;
+  } else if (q.type === 'text'){
+    body += `<input type="text" value="${val||''}" placeholder="${q.hint||''}"
+      oninput="selectAnswer('${q.id}', this.value, true)"
+      style="width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font:inherit">`;
+  } else if (q.type === 'number'){
+    body += `<input type="number" min="0" value="${val||''}" placeholder="${q.hint||''}"
+      oninput="selectAnswer('${q.id}', this.value, true)"
+      style="width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font:inherit">`;
+  }
+
+  if (q.type !== 'text' && q.type !== 'number'){
+    body += `<div class="dont-know"><label>
+      <input type="radio" name="${q.id}" value="dont_know" ${val==='dont_know'?'checked':''}
+             onchange="selectAnswer('${q.id}','dont_know')">
+      Затрудняюсь ответить</label></div>`;
+  }
+
+  document.getElementById('app').innerHTML = `
+    <div class="card">
+      <div class="block-tag">${q.blockName}</div>
+      <h1 class="q-title">${q.title}<span class="required">*</span></h1>
+      ${q.hint?`<p class="q-hint">${q.hint}</p>`:''}
+      ${body}
+    </div>
+    <div class="footer">
+      <div class="left">
+        <button class="btn-ghost" onclick="goMenu()">Главное меню</button>
+        ${current>0?`<button class="btn-ghost" onclick="prev()">Назад</button>`:''}
+      </div>
+      <button class="btn-primary" id="nextBtn" ${answers[q.id]!==undefined?'':'disabled'} onclick="next()">
+        ${current===total-1?'Показать результат':'Далее'}
+      </button>
+    </div>`;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function selectAnswer(id, value, isText){
+  answers[id] = value;
+  if (!isText){
+    document.querySelectorAll('input[name="'+id+'"]').forEach(inp=>{
+      const lbl = inp.closest('.opt,.scale-opt');
+      if (lbl) lbl.classList.toggle('selected', inp.checked);
+    });
+  }
+  const btn = document.getElementById('nextBtn');
+  if (btn) btn.disabled = false;
+  updateProgress();
+}
+
+function toggleMulti(id, el){
+  const q = allQuestions.find(x => x.id === id);
+  const
