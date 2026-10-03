@@ -473,9 +473,11 @@ fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'}
 .catch(function(e){console.warn('Не удалось отправить ответы:',e);});
 }
 function showIndividualReport(){
-var saved=JSON.parse(localStorage.getItem('lastResult')||'{}');
-var b1=saved.b1,b2=saved.b2,b3=saved.b3,b4=saved.b4;
-if(!b1||!b2||!b3||!b4){alert('Данные отчёта не найдены. Пройдите опрос заново.');return;}
+var b1=calcBlock1();
+var b2=calcBlock2();
+var b3=calcBlock3();
+var b4=calcBlock4();
+if(!b1||!b2||!b3||!b4){alert('Недостаточно данных для отчёта. Пройдите опрос заново.');return;}
 function en(t){return '<span class="en">('+t+')</span>';}
 function badge(val,low,high){
 if(val<low)return '<span class="badge bad">критично</span>';
@@ -494,9 +496,10 @@ html+='<div class="metric"><span><b>Итоговая вовлечённость<
 html+='<p class="muted" style="margin-top:8px">'+b1.level+'</p>';
 html+='<p class="muted">'+b1.focus+'</p></div>';
 html+='<div class="rec"><h3>Понимание и коммуникация '+en('Understanding & Information Clarity')+'</h3>';
-html+='<div class="metric"><span>Индекс понимания структуры '+en('UICI')+'</span><span class="val">'+badge(b2.UICI,2.5,3.5)+' '+b2.UICI.toFixed(2)+'</span></div>';
+html+='<div class="metric"><span>Индекс понимания структуры '+en('UICI')+'</span><span class="val">'+(b2.UICI!==null?badge(b2.UICI,2.5,3.5)+' '+b2.UICI.toFixed(2):'—')+'</span></div>';
 html+='<div class="metric"><span>Есть информационные пробелы</span><span class="val">'+(b2.silo?'Да':'Нет')+'</span></div>';
-html+='<p class="muted" style="margin-top:8px">'+b2.uiciLevel+'</p></div>';
+if(b2.uiciLevel)html+='<p class="muted" style="margin-top:8px">'+b2.uiciLevel+'</p>';
+html+='</div>';
 html+='<div class="rec"><h3>Управление временем '+en('Time Management')+'</h3>';
 html+='<div class="metric"><span>Эффективность управления временем '+en('TMEI')+'</span><span class="val">'+badge(b3.tmeiNorm,2.5,3.5)+' '+b3.tmeiNorm.toFixed(2)+'</span></div>';
 html+='<div class="metric"><span>Что отвлекает больше всего</span><span class="val">'+b3.distrLabel+'</span></div>';
