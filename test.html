@@ -477,7 +477,7 @@ var b1=calcBlock1();
 var b2=calcBlock2();
 var b3=calcBlock3();
 var b4=calcBlock4();
-if(!b1||!b2||!b3||!b4){alert('Недостаточно данных для отчёта. Пройдите опрос заново.');return;}
+if(!b1&&!b2&&!b3&&!b4){alert('Вы не ответили ни на один вопрос. Пройдите опрос заново.');return;}
 function en(t){return '<span class="en">('+t+')</span>';}
 function badge(val,low,high){
 if(val<low)return '<span class="badge bad">критично</span>';
@@ -489,21 +489,31 @@ html+='<div class="card">';
 html+='<h2 style="font-size:22px;margin:0 0 6px">Ваш персональный отчёт</h2>';
 html+='<p class="muted" style="margin:0 0 20px;font-size:14px">Что показали ваши ответы и что с этим можно сделать.</p>';
 html+='<div class="rec"><h3>Вовлечённость '+en('Engagement')+'</h3>';
+if(b1){
 html+='<div class="metric"><span>Эмоциональная вовлечённость '+en('EEI')+'</span><span class="val">'+b1.EEI.toFixed(2)+'</span></div>';
 html+='<div class="metric"><span>Поведенческая вовлечённость '+en('BEI')+'</span><span class="val">'+b1.BEI.toFixed(2)+'</span></div>';
 html+='<div class="metric"><span>Понимание своего вклада '+en('CEI')+'</span><span class="val">'+b1.CEI.toFixed(2)+'</span></div>';
 html+='<div class="metric"><span><b>Итоговая вовлечённость</b> '+en('Engagement Score')+'</span><span class="val">'+badge(b1.score,2.5,3.5)+' '+b1.score.toFixed(2)+'</span></div>';
 html+='<p class="muted" style="margin-top:8px">'+b1.level+'</p>';
-html+='<p class="muted">'+b1.focus+'</p></div>';
+html+='<p class="muted">'+b1.focus+'</p>';
+}else{
+html+='<p class="muted">Недостаточно данных: на часть вопросов блока вы ответили «Затрудняюсь ответить».</p>';
+}
+html+='</div>';
 html+='<div class="rec"><h3>Понимание и коммуникация '+en('Understanding & Information Clarity')+'</h3>';
 html+='<div class="metric"><span>Индекс понимания структуры '+en('UICI')+'</span><span class="val">'+(b2.UICI!==null?badge(b2.UICI,2.5,3.5)+' '+b2.UICI.toFixed(2):'—')+'</span></div>';
 html+='<div class="metric"><span>Есть информационные пробелы</span><span class="val">'+(b2.silo?'Да':'Нет')+'</span></div>';
 if(b2.uiciLevel)html+='<p class="muted" style="margin-top:8px">'+b2.uiciLevel+'</p>';
 html+='</div>';
 html+='<div class="rec"><h3>Управление временем '+en('Time Management')+'</h3>';
+if(b3){
 html+='<div class="metric"><span>Эффективность управления временем '+en('TMEI')+'</span><span class="val">'+badge(b3.tmeiNorm,2.5,3.5)+' '+b3.tmeiNorm.toFixed(2)+'</span></div>';
 html+='<div class="metric"><span>Что отвлекает больше всего</span><span class="val">'+b3.distrLabel+'</span></div>';
-html+='<p class="muted" style="margin-top:8px">'+b3.level+'</p></div>';
+html+='<p class="muted" style="margin-top:8px">'+b3.level+'</p>';
+}else{
+html+='<p class="muted">Недостаточно данных: на часть вопросов блока вы ответили «Затрудняюсь ответить».</p>';
+}
+html+='</div>';
 html+='<div class="rec"><h3>Мотивация '+en('Motivation Profile')+'</h3>';
 html+='<div class="metric"><span>Ведущий мотиватор '+en('PMC')+'</span><span class="val">'+b4.pmc+'</span></div>';
 html+='<div class="metric"><span>Ваш сегмент</span><span class="val">'+b4.segment+'</span></div>';
