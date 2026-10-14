@@ -194,6 +194,7 @@ html+='</div>';
 document.getElementById('app').innerHTML=html;
 document.getElementById('submitBtn').addEventListener('click',createSurvey);
 document.getElementById('copyBtn').addEventListener('click',copyLink);
+document.getElementById('buildNowBtn').addEventListener('click',buildNow);  
 }
 function createSurvey(){
 var company=document.getElementById('company').value.trim();
@@ -209,6 +210,7 @@ if(data.ok){
 document.getElementById('formCard').style.display='none';
 document.getElementById('successCard').style.display='block';
 document.getElementById('surveyLink').value=data.surveyUrl;
+loadAnswerCount();  
 window.scrollTo({top:0,behavior:'smooth'});
 }else{
 alert('Ошибка: '+(data.error||'неизвестная'));
@@ -224,6 +226,44 @@ function copyLink(){
 var input=document.getElementById('surveyLink');
 input.select();document.execCommand('copy');alert('Ссылка скопирована');
 }
+function loadAnswerCount(){
+var token=(document.getElementById('surveyLink').value||'').split('c=')[1]||'';
+if(!token)return;
+fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'getAnswerCount',token:token})})
+.then(function(r){return r.json();})
+.then(function(data){
+var el=document.getElementById('answerCount');
+if(el)el.textContent=data.ok?data.count:'0';
+})
+.catch(function(){
+var el=document.getElementById('answerCount');
+if(el)el.textContent='0';
+});
+}
+function buildNow(){
+var btn=document.getElementById('buildNowBtn');
+var msg=document.getElementById('buildNowMsg');
+var token=(document.getElementById('surveyLink').value||'').split('c=')[1]||'';
+if(!token){msg.textContent='Не удалось определить токен компании.';return;}
+btn.disabled=true;btn.textContent='Собираем отчёты…';
+msg.textContent='Обычно это занимает 1–3 минуты. Не закрывайте страницу.';
+fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'buildReportsNow',token:token})})
+.then(function(r){return r.json();})
+.then(function(data){
+if(data.ok){
+btn.textContent='Отчёты собраны';
+loadAnswerCount();
+msg.innerHTML='<b>Готово!</b> Отчёты лежат в папке. Мы также отправили письмо на ваш email.';
+}else{
+btn.disabled=false;btn.textContent='Сформировать отчёт сейчас';
+msg.textContent=data.message||'Не удалось собрать отчёты.';
+}
+})
+.catch(function(e){
+btn.disabled=false;btn.textContent='Сформировать отчёт сейчас';
+msg.textContent='Ошибка: '+e.message;
+});
+}  
 function startSurvey(){
 document.getElementById('progressWrap').classList.remove('hidden');
 current=0;
